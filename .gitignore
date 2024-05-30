@@ -15,3 +15,6 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Ignore videos directory in resources
+src/main/resources/videos/
