@@ -18,3 +18,4 @@ buildNumber.properties
 
 # Ignore videos directory in resources
 src/main/resources/videos/
+src/main/resources/application.properties

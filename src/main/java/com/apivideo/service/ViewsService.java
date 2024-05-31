@@ -3,14 +3,8 @@ package com.apivideo.service;
 import com.apivideo.entity.Views;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-/**
- * <p>
- *  服务类
- * </p>
- *
- * @author jiexinXe
- * @since 2024-05-31
- */
-public interface ViewsService extends IService<Views> {
+import java.util.List;
 
+public interface ViewsService extends IService<Views> {
+    List<Integer> getViewedVideoIds(String username);
 }
