@@ -150,4 +150,9 @@ public class VideosController {
         videosService.likeVideo(userId, videoId);
         return "Video liked successfully!";
     }
+
+    @GetMapping("/{videoId}/hasLiked")
+    public boolean hasLiked(@PathVariable Integer videoId, @RequestParam Integer userId) {
+        return videosService.hasLiked(userId, videoId);
+    }
 }

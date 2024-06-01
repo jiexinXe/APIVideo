@@ -10,4 +10,7 @@ public interface VideosService extends IService<Videos> {
 
     // 用户点赞
     void likeVideo(Integer userId, Integer videoId);
+
+    // 该视频用户是否已经点赞
+    boolean hasLiked(Integer userId, Integer videoId);
 }

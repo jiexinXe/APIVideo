@@ -57,4 +57,10 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
             likesMapper.insert(like);
         }
     }
+
+    @Override
+    public boolean hasLiked(Integer userId, Integer videoId) {
+        int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
+        return count > 0;
+    }
 }
