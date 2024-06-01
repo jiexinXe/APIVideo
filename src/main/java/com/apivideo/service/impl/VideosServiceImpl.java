@@ -10,6 +10,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author jiexinXe
+ * @since 2024-05-31
+ */
 @Service
 public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> implements VideosService {
 
