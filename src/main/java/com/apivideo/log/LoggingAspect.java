@@ -23,7 +23,7 @@ public class LoggingAspect {
 
     @Pointcut("execution(* com.apivideo.controller..*(..))")
     public void controllerMethods() {
-        // 切点，包含所有方法    
+        // 切点，包含所有方法
     }
 
     @Around("controllerMethods()")

@@ -142,4 +142,12 @@ public class VideosController {
         }
         return videosService.getRecommendedVideos(username, 4);
     }
+
+    // 点赞，URL为http://localhost:8080/videos/{videoId}/like?userId={userId}
+    // 示例：http://localhost:8080/videos/172/like?userId=29
+    @PostMapping("/{videoId}/like")
+    public String likeVideo(@PathVariable Integer videoId, @RequestParam Integer userId) {
+        videosService.likeVideo(userId, videoId);
+        return "Video liked successfully!";
+    }
 }
