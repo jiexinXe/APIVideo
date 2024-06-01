@@ -2,6 +2,8 @@ package com.apivideo.controller;
 
 import com.apivideo.entity.Videos;
 import com.apivideo.service.VideosService;
+import com.apivideo.utils.Code;
+import com.apivideo.utils.Rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -154,5 +156,29 @@ public class VideosController {
     @GetMapping("/{videoId}/hasLiked")
     public boolean hasLiked(@PathVariable Integer videoId, @RequestParam Integer userId) {
         return videosService.hasLiked(userId, videoId);
+    }
+
+    /**
+     * 用于查看用户的所有视频
+     * 示例:http://localhost:8080/videos/1
+     * 示例url获取用户id为1的用户的所有视频
+     */
+    @GetMapping("/{userid}")
+    public Rest getVideosOfUser(@PathVariable Integer userid){
+        List<Videos> videos = videosService.getVideosOfUser(userid);
+        return new Rest(Code.rc200.getCode(), videos, "该用户视频列表");
+    }
+
+    /**
+     * 用于删除用户的视频
+     * 示例:http://localhost:8080/videos/2
+     * 示例为删除用户id为2的用户的视频
+     * 参数userid:发送操作用户的id;video_id:发送需要删除的视频的id
+     * */
+    @DeleteMapping("/{userid}")
+    public Rest deleteVideo(@PathVariable Integer userid, @RequestParam("userid")Integer delete_user, @RequestParam("video_id")Integer video_id){
+        if(videosService.deleteVideo(userid, delete_user, video_id))
+            return new Rest(Code.rc200.getCode(), "视频删除成功");
+        return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }
 }

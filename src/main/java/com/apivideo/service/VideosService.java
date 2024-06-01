@@ -13,4 +13,7 @@ public interface VideosService extends IService<Videos> {
 
     // 该视频用户是否已经点赞
     boolean hasLiked(Integer userId, Integer videoId);
+
+    List<Videos> getVideosOfUser(Integer userid);
+    boolean deleteVideo(Integer video_user, Integer delete_user, Integer video_id);
 }

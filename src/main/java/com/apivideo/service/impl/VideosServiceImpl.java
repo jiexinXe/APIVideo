@@ -6,12 +6,14 @@ import com.apivideo.mapper.LikesMapper;
 import com.apivideo.mapper.VideosMapper;
 import com.apivideo.service.VideosService;
 import com.apivideo.service.ViewsService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -26,6 +28,8 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
 
     @Autowired
     private ViewsService viewsService;
+    @Autowired
+    private VideosMapper videosmapper;
     @Autowired
     private LikesMapper likesMapper;
 
@@ -62,5 +66,30 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     public boolean hasLiked(Integer userId, Integer videoId) {
         int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
         return count > 0;
+    }
+
+    @Override
+    public List<Videos> getVideosOfUser(Integer userid) {
+        QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
+        videowrapper.eq("user_id", userid);
+        List<Videos> videos = videosmapper.selectList(videowrapper);
+
+        return videos;
+    }
+
+    @Override
+    public boolean deleteVideo(Integer video_user, Integer delete_user, Integer video_id) {
+        //根据视频id检索视频信息
+        QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
+        videowrapper.eq("video_id", video_id);
+        Videos video = videosmapper.selectOne(videowrapper);
+
+        //对照视频拥有者id与删除者id，两者必须相同才能删除
+        if (!Objects.equals(video_user, video.getUserId()) || !Objects.equals(delete_user, video.getUserId()))
+            return false;
+
+        // 删除视频
+        videosmapper.delete(videowrapper);
+        return true;
     }
 }
