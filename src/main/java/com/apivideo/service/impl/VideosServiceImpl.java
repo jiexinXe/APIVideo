@@ -69,7 +69,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
-    public List<Videos> getVideosOfUser(Integer userid) {
+    public List<Videos> getVideosOfUser(Integer userid, String page) {
         QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
         videowrapper.eq("user_id", userid);
         List<Videos> videos = videosmapper.selectList(videowrapper);
