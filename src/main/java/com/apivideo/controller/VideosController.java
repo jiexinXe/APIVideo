@@ -180,8 +180,9 @@ public class VideosController {
      */
     @ApiOperation(value = "查看用户的所有视频", notes = "根据用户ID获取用户的所有视频")
     @GetMapping("/{userid}")
-    public Rest getVideosOfUser(@ApiParam(value = "用户ID", required = true) @PathVariable Integer userid) {
-        List<Videos> videos = videosService.getVideosOfUser(userid);
+
+    public Rest getVideosOfUser(@PathVariable Integer userid, @RequestParam("page")String page){
+        List<Videos> videos = videosService.getVideosOfUser(userid, page);
         return new Rest(Code.rc200.getCode(), videos, "该用户视频列表");
     }
 
