@@ -1,6 +1,7 @@
 package com.apivideo.service;
 
 import com.apivideo.entity.Videos;
+import com.apivideo.utils.Rest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -19,4 +20,5 @@ public interface VideosService extends IService<Videos> {
 
     List<Videos> getVideosOfUser(Integer userid, String page);
     boolean deleteVideo(Integer videoUser, Integer deleteUser, Integer videoId);
+    String getCover(String videoid);
 }

@@ -1,5 +1,10 @@
 package com.apivideo.controller;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
 import com.apivideo.entity.Users;
 import com.apivideo.entity.Videos;
 import com.apivideo.service.UsersService;
@@ -14,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -184,5 +190,28 @@ public class VideosController {
         if (videosService.deleteVideo(userid, deleteUser, videoId))
             return new Rest(Code.rc200.getCode(), "视频删除成功");
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
+    }
+
+    @ApiOperation(value = "获取视频封面", notes = "根据用户ID和视频ID删除视频")
+    @GetMapping("/cover/{videoid}")
+    public String getCoverOfVideo(@PathVariable("videoid")String videoid) throws IOException {
+
+
+        String local_path = "src/main/resources/videos/";
+
+        String cover_path = videosService.getCover(videoid);
+
+        // 读取图片文件
+        File file = new File(local_path + cover_path);
+
+
+        byte[] imageBytes = Files.readAllBytes(file.toPath());
+
+        // 将图片字节数组进行 Base64 编码
+        String base64EncodedImage = Base64Utils.encodeToString(imageBytes);
+
+        // 构建响应
+//        return new Rest(Code.rc200.getCode(), base64EncodedImage, "该视频的封面");
+        return base64EncodedImage;
     }
 }
