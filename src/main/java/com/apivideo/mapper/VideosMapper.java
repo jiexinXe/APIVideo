@@ -9,9 +9,21 @@ import java.util.List;
 
 public interface VideosMapper extends BaseMapper<Videos> {
 
-    @Select("SELECT * FROM Videos ORDER BY likes DESC LIMIT #{offset}, #{size}")
-    List<Videos> getTopVideos(@Param("offset") int offset, @Param("size") int size);
+    @Select("SELECT video_id, user_id, title, description, cover_path, video_path, likes, comments, collections, shares, upload_time " +
+            "FROM videos " +
+            "ORDER BY likes DESC LIMIT #{limit}")
+    List<Videos> selectRecommendedVideosWithoutExclusions(@Param("limit") int limit);
 
-    @Select("SELECT * FROM Videos WHERE video_id NOT IN (SELECT video_id FROM Views WHERE user_id = (SELECT user_id FROM Users WHERE username = #{username})) ORDER BY likes DESC LIMIT #{offset}, #{size}")
-    List<Videos> getPersonalizedRecommendations(@Param("username") String username, @Param("offset") int offset, @Param("size") int size);
+    @Select({
+            "<script>",
+            "SELECT video_id, user_id, title, description, cover_path, video_path, likes, comments, collections, shares, upload_time ",
+            "FROM videos ",
+            "WHERE video_id NOT IN ",
+            "<foreach item='id' collection='excludedVideoIds' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach> ",
+            "ORDER BY likes DESC LIMIT #{limit}",
+            "</script>"
+    })
+    List<Videos> selectRecommendedVideosWithExclusions(@Param("excludedVideoIds") List<Integer> excludedVideoIds, @Param("limit") int limit);
 }

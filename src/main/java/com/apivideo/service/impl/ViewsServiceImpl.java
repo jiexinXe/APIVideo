@@ -1,26 +1,31 @@
 package com.apivideo.service.impl;
 
-import com.apivideo.entity.Views;
 import com.apivideo.mapper.ViewsMapper;
 import com.apivideo.service.ViewsService;
-import com.apivideo.service.UsersService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
-public class ViewsServiceImpl extends ServiceImpl<ViewsMapper, Views> implements ViewsService {
+public class ViewsServiceImpl implements ViewsService {
 
     @Autowired
-    private UsersService usersService;
+    private ViewsMapper viewsMapper;
 
     @Override
-    public List<Integer> getViewedVideoIds(String username) {
-        Integer userId = usersService.findByUsername(username).getUserId();
-        return this.lambdaQuery().eq(Views::getUserId, userId).list()
-                .stream().map(Views::getVideoId).collect(Collectors.toList());
+    public void addViewedVideo(Integer userId, Integer videoId) {
+        viewsMapper.insertViewedVideo(userId, videoId);
+    }
+
+    @Override
+    public List<Integer> getViewedVideoIds(Integer userId) {
+        return viewsMapper.selectViewedVideoIds(userId);
     }
 }
+

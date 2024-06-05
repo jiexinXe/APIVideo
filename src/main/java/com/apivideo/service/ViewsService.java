@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
-public interface ViewsService extends IService<Views> {
-    List<Integer> getViewedVideoIds(String username);
+public interface ViewsService {
+    void addViewedVideo(Integer userId, Integer videoId);
+    List<Integer> getViewedVideoIds(Integer userId);
 }
