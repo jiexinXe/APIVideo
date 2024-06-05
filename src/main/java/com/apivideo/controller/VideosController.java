@@ -153,8 +153,13 @@ public class VideosController {
     @PostMapping("/{videoId}/like")
     public String likeVideo(@ApiParam(value = "视频ID", required = true) @PathVariable Integer videoId,
                             @ApiParam(value = "用户ID", required = true) @RequestParam Integer userId) {
-        videosService.likeVideo(userId, videoId);
-        return "Video liked successfully!";
+        if (videosService.hasLiked(userId, videoId)) {
+            videosService.unlikeVideo(userId, videoId);
+            return "Video unliked successfully!";
+        } else {
+            videosService.likeVideo(userId, videoId);
+            return "Video liked successfully!";
+        }
     }
 
     @ApiOperation(value = "检查用户是否已点赞视频", notes = "检查用户是否已经点赞某个视频")

@@ -67,6 +67,22 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
+    @Transactional
+    public void unlikeVideo(Integer userId, Integer videoId) {
+        // 更新视频的点赞数
+        Videos video = this.getById(videoId);
+        if (video != null) {
+            video.setLikes(video.getLikes() - 1);
+            this.updateById(video);
+
+            // 从 likes 表中删除记录
+            QueryWrapper<Likes> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).eq("video_id", videoId);
+            likesMapper.delete(queryWrapper);
+        }
+    }
+
+    @Override
     public boolean hasLiked(Integer userId, Integer videoId) {
         int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
         return count > 0;
