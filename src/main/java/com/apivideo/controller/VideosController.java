@@ -37,11 +37,14 @@ import java.util.Map;
 @Api(tags = "视频控制器", description = "管理视频相关的API")
 public class VideosController {
 
-    // 引入返回视频流的组件
     private final NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
 
     @Autowired
     private VideosService videosService;
+    @Autowired
+    private UsersService usersService;
+    @Autowired
+    private ViewsService viewsService;
 
     public VideosController(NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler) {
         this.nonStaticResourceHttpRequestHandler = nonStaticResourceHttpRequestHandler;
@@ -135,11 +138,15 @@ public class VideosController {
     @GetMapping("/recommend")
     public List<Videos> getRecommendedVideos() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = null;
+        Integer userId = null;
         if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
+            String username = ((UserDetails) principal).getUsername();
+            Users user = usersService.findByUsername(username);
+            if (user != null) {
+                userId = user.getUserId();
+            }
         }
-        return videosService.getRecommendedVideos(username, 4);
+        return videosService.getRecommendedVideos(userId, 4);
     }
 
     @ApiOperation(value = "点赞视频", notes = "用户可以通过提供视频ID和用户ID点赞视频")
@@ -159,8 +166,7 @@ public class VideosController {
 
     @ApiOperation(value = "查看用户的所有视频", notes = "根据用户ID获取用户的所有视频")
     @GetMapping("/{userid}")
-
-    public Rest getVideosOfUser(@PathVariable Integer userid, @RequestParam("page")String page){
+    public Rest getVideosOfUser(@PathVariable Integer userid, @RequestParam("page") String page) {
         List<Videos> videos = videosService.getVideosOfUser(userid, page);
         return new Rest(Code.rc200.getCode(), videos, "该用户视频列表");
     }
@@ -168,9 +174,9 @@ public class VideosController {
     @ApiOperation(value = "删除用户的视频", notes = "根据用户ID和视频ID删除视频")
     @DeleteMapping("/{userid}")
     public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer userid,
-                            @ApiParam(value = "发送操作用户的ID", required = true) @RequestParam("userid") Integer delete_user,
-                            @ApiParam(value = "需要删除的视频ID", required = true) @RequestParam("video_id") Integer video_id) {
-        if (videosService.deleteVideo(userid, delete_user, video_id))
+                            @ApiParam(value = "发送操作用户的ID", required = true) @RequestParam("userid") Integer deleteUser,
+                            @ApiParam(value = "需要删除的视频ID", required = true) @RequestParam("video_id") Integer videoId) {
+        if (videosService.deleteVideo(userid, deleteUser, videoId))
             return new Rest(Code.rc200.getCode(), "视频删除成功");
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }

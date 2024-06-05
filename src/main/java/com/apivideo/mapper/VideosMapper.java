@@ -2,11 +2,12 @@ package com.apivideo.mapper;
 
 import com.apivideo.entity.Videos;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
-
+@Mapper
 public interface VideosMapper extends BaseMapper<Videos> {
 
     @Select("SELECT video_id, user_id, title, description, cover_path, video_path, likes, comments, collections, shares, upload_time " +

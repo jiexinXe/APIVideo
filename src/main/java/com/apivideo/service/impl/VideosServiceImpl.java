@@ -29,19 +29,23 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     @Autowired
     private ViewsService viewsService;
     @Autowired
-    private VideosMapper videosmapper;
+    private VideosMapper videosMapper;
     @Autowired
     private LikesMapper likesMapper;
 
     @Override
-    public List<Videos> getRecommendedVideos(String username, int limit) {
-        if (username == null) {
+    public List<Videos> getRecommendedVideos(Integer userId, int limit) {
+        if (userId == null) {
             // 未登录状态下推荐按点赞数排序的视频
-            return this.lambdaQuery().orderByDesc(Videos::getLikes).last("LIMIT " + limit).list();
+            return videosMapper.selectRecommendedVideosWithoutExclusions(limit);
         } else {
             // 登录状态下推荐用户未观看的按点赞数排序的视频
-            List<Integer> viewedVideoIds = viewsService.getViewedVideoIds(username);
-            return this.lambdaQuery().notIn(Videos::getVideoId, viewedVideoIds).orderByDesc(Videos::getLikes).last("LIMIT " + limit).list();
+            List<Integer> viewedVideoIds = viewsService.getViewedVideoIds(userId);
+            if (viewedVideoIds.isEmpty()) {
+                return videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+            } else {
+                return videosMapper.selectRecommendedVideosWithExclusions(viewedVideoIds, limit);
+            }
         }
     }
 
@@ -69,27 +73,25 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
-    public List<Videos> getVideosOfUser(Integer userid, String page) {
-        QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
-        videowrapper.eq("user_id", userid);
-        List<Videos> videos = videosmapper.selectList(videowrapper);
-
-        return videos;
+    public List<Videos> getVideosOfUser(Integer userId, String page) {
+        QueryWrapper<Videos> videoWrapper = new QueryWrapper<>();
+        videoWrapper.eq("user_id", userId);
+        return videosMapper.selectList(videoWrapper);
     }
 
     @Override
-    public boolean deleteVideo(Integer video_user, Integer delete_user, Integer video_id) {
-        //根据视频id检索视频信息
-        QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
-        videowrapper.eq("video_id", video_id);
-        Videos video = videosmapper.selectOne(videowrapper);
+    public boolean deleteVideo(Integer videoUser, Integer deleteUser, Integer videoId) {
+        // 根据视频id检索视频信息
+        QueryWrapper<Videos> videoWrapper = new QueryWrapper<>();
+        videoWrapper.eq("video_id", videoId);
+        Videos video = videosMapper.selectOne(videoWrapper);
 
-        //对照视频拥有者id与删除者id，两者必须相同才能删除
-        if (!Objects.equals(video_user, video.getUserId()) || !Objects.equals(delete_user, video.getUserId()))
+        // 对照视频拥有者id与删除者id，两者必须相同才能删除
+        if (!Objects.equals(videoUser, video.getUserId()) || !Objects.equals(deleteUser, video.getUserId()))
             return false;
 
         // 删除视频
-        videosmapper.delete(videowrapper);
+        videosMapper.delete(videoWrapper);
         return true;
     }
 }
