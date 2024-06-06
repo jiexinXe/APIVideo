@@ -6,6 +6,8 @@ import com.apivideo.mapper.LikesMapper;
 import com.apivideo.mapper.VideosMapper;
 import com.apivideo.service.VideosService;
 import com.apivideo.service.ViewsService;
+import com.apivideo.utils.Code;
+import com.apivideo.utils.Rest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,22 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
+    @Transactional
+    public void unlikeVideo(Integer userId, Integer videoId) {
+        // 更新视频的点赞数
+        Videos video = this.getById(videoId);
+        if (video != null) {
+            video.setLikes(video.getLikes() - 1);
+            this.updateById(video);
+
+            // 从 likes 表中删除记录
+            QueryWrapper<Likes> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).eq("video_id", videoId);
+            likesMapper.delete(queryWrapper);
+        }
+    }
+
+    @Override
     public boolean hasLiked(Integer userId, Integer videoId) {
         int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
         return count > 0;
@@ -93,5 +111,16 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
         // 删除视频
         videosMapper.delete(videoWrapper);
         return true;
+    }
+
+    @Override
+    public String getCover(String videoid) {
+        QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
+        videowrapper.eq("video_id", videoid);
+        Videos video = videosMapper.selectOne(videowrapper);
+
+        String cover_path = video.getCoverPath();
+
+        return cover_path;
     }
 }
