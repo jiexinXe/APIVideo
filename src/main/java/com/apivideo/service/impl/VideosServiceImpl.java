@@ -98,14 +98,14 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
-    public boolean deleteVideo(Integer videoUser, Integer deleteUser, Integer videoId) {
+    public boolean deleteVideo(Integer deleteUser, Integer videoId) {
         // 根据视频id检索视频信息
         QueryWrapper<Videos> videoWrapper = new QueryWrapper<>();
         videoWrapper.eq("video_id", videoId);
         Videos video = videosMapper.selectOne(videoWrapper);
 
         // 对照视频拥有者id与删除者id，两者必须相同才能删除
-        if (!Objects.equals(videoUser, video.getUserId()) || !Objects.equals(deleteUser, video.getUserId()))
+        if (!Objects.equals(deleteUser, video.getUserId()))
             return false;
 
         // 删除视频

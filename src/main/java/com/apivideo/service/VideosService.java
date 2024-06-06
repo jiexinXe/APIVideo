@@ -19,6 +19,6 @@ public interface VideosService extends IService<Videos> {
     void unlikeVideo(Integer userId, Integer videoId);
 
     List<Videos> getVideosOfUser(Integer userid, String page);
-    boolean deleteVideo(Integer videoUser, Integer deleteUser, Integer videoId);
+    boolean deleteVideo(Integer deleteUser, Integer videoId);
     String getCover(String videoid);
 }

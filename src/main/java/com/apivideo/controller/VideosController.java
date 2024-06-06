@@ -184,10 +184,9 @@ public class VideosController {
 
     @ApiOperation(value = "删除用户的视频", notes = "根据用户ID和视频ID删除视频")
     @DeleteMapping("/{userid}")
-    public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer userid,
-                            @ApiParam(value = "发送操作用户的ID", required = true) @RequestParam("userid") Integer deleteUser,
+    public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer deleteUser,
                             @ApiParam(value = "需要删除的视频ID", required = true) @RequestParam("video_id") Integer videoId) {
-        if (videosService.deleteVideo(userid, deleteUser, videoId))
+        if (videosService.deleteVideo(deleteUser, videoId))
             return new Rest(Code.rc200.getCode(), "视频删除成功");
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }
