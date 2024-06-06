@@ -22,10 +22,11 @@ public class ApiVideoApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
+                        .allowedOriginPatterns("http://localhost:8081")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true)
+                        .exposedHeaders("Access-Control-Allow-Headers", "Authorization", "Access-Control-Allow-Origin")
                         .maxAge(3600);
             }
         };
