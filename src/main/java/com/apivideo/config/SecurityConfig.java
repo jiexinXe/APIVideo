@@ -51,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs",
                         "/v3/api-docs",
                         "/webjars/**").permitAll()
+                .antMatchers("/videos/list", "/videos/recommend", "/videos/get/**").permitAll() // 取消对这些端点的鉴权保护
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

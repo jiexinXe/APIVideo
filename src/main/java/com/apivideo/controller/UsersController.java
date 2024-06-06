@@ -59,11 +59,18 @@ public class UsersController {
 
     @ApiOperation(value = "获取用户信息", notes = "获取当前登录用户的信息")
     @GetMapping("/info")
-    public Users getUserInfo() {
+    public Map<String, Object> getUserInfo() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             String username = ((UserDetails) principal).getUsername();
-            return usersService.findByUsername(username);
+            Users user = usersService.findByUsername(username);
+            if (user != null) {
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("userId", user.getUserId());
+                userInfo.put("username", user.getUsername());
+                // 如果你有更多需要返回的用户信息，可以在这里添加
+                return userInfo;
+            }
         }
         return null;
     }
