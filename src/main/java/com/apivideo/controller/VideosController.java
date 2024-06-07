@@ -43,18 +43,12 @@ import java.util.Map;
 @Api(tags = "视频控制器", description = "管理视频相关的API")
 public class VideosController {
 
-    private final NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
-
     @Autowired
     private VideosService videosService;
     @Autowired
     private UsersService usersService;
     @Autowired
     private ViewsService viewsService;
-
-    public VideosController(NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler) {
-        this.nonStaticResourceHttpRequestHandler = nonStaticResourceHttpRequestHandler;
-    }
 
     @ApiOperation(value = "获取所有视频信息", notes = "获取数据库中所有视频的详细信息")
     @GetMapping("/list")
@@ -64,8 +58,7 @@ public class VideosController {
 
     @ApiOperation(value = "按视频ID查找单个视频", notes = "根据视频ID获取视频流")
     @GetMapping("/get/{id}")
-    public void getVideoById(HttpServletRequest request, HttpServletResponse response,
-                             @ApiParam(value = "视频ID", required = true) @PathVariable Integer id) throws ServletException, IOException {
+    public String getVideoById(@ApiParam(value = "视频ID", required = true) @PathVariable Integer id) throws ServletException, IOException {
         Videos video = videosService.getById(id);
         if (video != null) {
             // 记录用户观看历史
@@ -78,21 +71,19 @@ public class VideosController {
                 }
             }
             String videoPathUrl = video.getVideoPath();
-            Path filePath = Paths.get("src/main/resources/videos/" + videoPathUrl);
-            if (Files.exists(filePath)) {
-                String mimeType = Files.probeContentType(filePath);
-                if (StringUtils.hasText(mimeType)) {
-                    response.setContentType(mimeType);
-                }
-                request.setAttribute(NonStaticResourceHttpRequestHandler.ATTR_FILE, filePath);
-                nonStaticResourceHttpRequestHandler.handleRequest(request, response);
+            // 读取图片文件
+            File file = new File("src/main/resources/videos/" + videoPathUrl);
+
+
+            if (file.exists()) {
+                byte[] imageBytes = Files.readAllBytes(file.toPath());
+                // 将图片字节数组进行 Base64 编码
+                return Base64Utils.encodeToString(imageBytes);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+                return null;
             }
         } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+            return null;
         }
     }
 
