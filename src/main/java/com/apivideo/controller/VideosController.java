@@ -203,6 +203,9 @@ public class VideosController {
         // 读取图片文件
         File file = new File(local_path + cover_path);
 
+        // 若封面不存在，则展示暂无封面
+        if (!file.exists())
+            file = new File("src/main/resources/videos/默认封面/暂无封面.jpg");
 
         byte[] imageBytes = Files.readAllBytes(file.toPath());
 
