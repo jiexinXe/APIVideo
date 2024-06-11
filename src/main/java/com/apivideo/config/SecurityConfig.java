@@ -50,7 +50,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui/**",
                         "/v2/api-docs",
                         "/v3/api-docs",
-                        "/webjars/**").permitAll()
+                        "/webjars/**",
+                        "/videos/recommend", // 允许匿名访问视频推荐
+                        "/videos/{id}"       // 允许匿名访问根据ID获取视频
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
