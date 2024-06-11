@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface VideosService extends IService<Videos> {
     List<Videos> getRecommendedVideos(Integer userId, int limit);
+    List<Videos> getRandomVideos(int limit);
 
     // 用户点赞
     void likeVideo(Integer userId, Integer videoId);

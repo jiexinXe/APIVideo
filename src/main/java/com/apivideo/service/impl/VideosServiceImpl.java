@@ -85,6 +85,11 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
+    public List<Videos> getRandomVideos(int limit) {
+        return this.lambdaQuery().last("ORDER BY RAND() LIMIT " + limit).list();
+    }
+
+    @Override
     public boolean hasLiked(Integer userId, Integer videoId) {
         int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
         return count > 0;

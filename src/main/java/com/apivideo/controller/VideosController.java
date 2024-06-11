@@ -142,6 +142,9 @@ public class VideosController {
             if (user != null) {
                 userId = user.getUserId();
             }
+        } else if ("faketoken".equals(principal)) {
+            // 处理 faketoken 的情况
+            return videosService.getRandomVideos(4);
         }
         return videosService.getRecommendedVideos(userId, 4);
     }

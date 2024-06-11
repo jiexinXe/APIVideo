@@ -51,8 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs",
                         "/v3/api-docs",
                         "/webjars/**",
-                        "/videos/recommend", // 允许匿名访问视频推荐
-                        "/videos/{id}"       // 允许匿名访问根据ID获取视频
+                        "/videos/list"       // 允许匿名访问获取视频列表
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
