@@ -33,11 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader("Authorization");
+        System.out.println(header); // 打印 header 以便调试
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             if ("faketoken".equals(token)) {
-                // 设置匿名用户，不设置认证上下文
-                SecurityContextHolder.clearContext();
+                // 创建一个假的用户对象，并设置到SecurityContextHolder中
+                UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername("faketoken")
+                        .password("")
+                        .authorities("USER")
+                        .build();
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } else if (jwtUtils.validateToken(token)) {
                 String username = jwtUtils.getUsernameFromToken(token);
                 Users user = usersService.findByUsername(username);

@@ -39,14 +39,21 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     public List<Videos> getRecommendedVideos(Integer userId, int limit) {
         if (userId == null) {
             // 未登录状态下推荐按点赞数排序的视频
-            return videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+            List<Videos> videos = videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+            System.out.println("Recommended videos for anonymous user: " + videos);
+            return videos;
         } else {
             // 登录状态下推荐用户未观看的按点赞数排序的视频
             List<Integer> viewedVideoIds = viewsService.getViewedVideoIds(userId);
+            System.out.println("User ID: " + userId + ", Viewed video IDs: " + viewedVideoIds);
             if (viewedVideoIds.isEmpty()) {
-                return videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+                List<Videos> videos = videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+                System.out.println("Recommended videos for user " + userId + ": " + videos);
+                return videos;
             } else {
-                return videosMapper.selectRecommendedVideosWithExclusions(viewedVideoIds, limit);
+                List<Videos> videos = videosMapper.selectRecommendedVideosWithExclusions(viewedVideoIds, limit);
+                System.out.println("Recommended videos for user " + userId + " with exclusions: " + videos);
+                return videos;
             }
         }
     }

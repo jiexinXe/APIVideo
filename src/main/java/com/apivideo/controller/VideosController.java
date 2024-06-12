@@ -138,14 +138,17 @@ public class VideosController {
         Integer userId = null;
         if (principal instanceof UserDetails) {
             String username = ((UserDetails) principal).getUsername();
-            Users user = usersService.findByUsername(username);
-            if (user != null) {
-                userId = user.getUserId();
+            if ("faketoken".equals(username)) {
+                // 处理 faketoken 的情况，返回随机推荐视频
+                return videosService.getRandomVideos(4);
+            } else {
+                Users user = usersService.findByUsername(username);
+                if (user != null) {
+                    userId = user.getUserId();
+                }
             }
-        } else if ("faketoken".equals(principal)) {
-            // 处理 faketoken 的情况
-            return videosService.getRandomVideos(4);
         }
+        System.out.println(userId); // 调试用
         return videosService.getRecommendedVideos(userId, 4);
     }
 
