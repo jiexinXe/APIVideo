@@ -1,5 +1,6 @@
 package com.apivideo.mapper;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -13,4 +14,7 @@ public interface ViewsMapper {
 
     @Select("SELECT video_id FROM views WHERE user_id = #{userId}")
     List<Integer> selectViewedVideoIds(@Param("userId") Integer userId);
+
+    @Delete("DELETE FROM views WHERE video_id = #{videoId}")
+    void deleteViewsByVideoId(@Param("videoId") Integer videoId);
 }

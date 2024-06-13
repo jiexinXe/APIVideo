@@ -27,5 +27,10 @@ public class ViewsServiceImpl implements ViewsService {
     public List<Integer> getViewedVideoIds(Integer userId) {
         return viewsMapper.selectViewedVideoIds(userId);
     }
+
+    @Override
+    public void deleteViewsByVideoId(Integer videoId){
+        viewsMapper.deleteViewsByVideoId(videoId);
+    }
 }
 

@@ -124,13 +124,6 @@ public class VideosController {
         }
     }
 
-    @ApiOperation(value = "按视频ID删除视频", notes = "根据视频ID删除视频")
-    @DeleteMapping("/deleteVideo/{id}")
-    public ResponseEntity<Object> deleteVideoById(@ApiParam(value = "视频ID", required = true) @PathVariable Integer id) {
-        boolean state = videosService.removeById(id);
-        return ResponseEntity.ok(state);
-    }
-
     @ApiOperation(value = "查询当前推荐视频", notes = "获取当前推荐的视频列表")
     @GetMapping("/recommend")
     public List<Videos> getRecommendedVideos() {
@@ -180,10 +173,10 @@ public class VideosController {
     }
 
     @ApiOperation(value = "删除用户的视频", notes = "根据用户ID和视频ID删除视频")
-    @DeleteMapping("/{userid}")
-    public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer deleteUser,
+    @DeleteMapping("/deleteVideo/{userid}")
+    public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer userid,
                             @ApiParam(value = "需要删除的视频ID", required = true) @RequestParam("video_id") Integer videoId) {
-        if (videosService.deleteVideo(deleteUser, videoId))
+        if (videosService.deleteVideo(userid, videoId))
             return new Rest(Code.rc200.getCode(), "视频删除成功");
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }

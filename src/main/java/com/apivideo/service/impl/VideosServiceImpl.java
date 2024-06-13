@@ -121,6 +121,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
             return false;
 
         // 删除视频
+        viewsService.deleteViewsByVideoId(videoId);
         videosMapper.delete(videoWrapper);
         return true;
     }
