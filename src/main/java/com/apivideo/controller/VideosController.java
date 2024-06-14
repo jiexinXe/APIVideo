@@ -181,6 +181,14 @@ public class VideosController {
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }
 
+    @ApiOperation(value = "删除视频", notes = "根据视频ID删除视频")
+    @DeleteMapping("/deleteVideoById/{videoId}")
+    public Rest deleteVideoById(@ApiParam(value = "需要删除的视频ID", required = true) @PathVariable Integer videoId) {
+        if (videosService.deleteVideoById(videoId))
+            return new Rest(Code.rc200.getCode(), "视频删除成功");
+        return new Rest(Code.rc403.getCode(), "视频删除失败");
+    }
+
     @ApiOperation(value = "获取视频封面", notes = "根据用户ID和视频ID删除视频")
     @GetMapping("/cover/{videoid}")
     public String getCoverOfVideo(@PathVariable("videoid")String videoid) throws IOException {

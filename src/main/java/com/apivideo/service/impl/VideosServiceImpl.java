@@ -127,6 +127,18 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     }
 
     @Override
+    public boolean deleteVideoById(Integer videoId) {
+        // 根据视频id检索视频信息
+        QueryWrapper<Videos> videoWrapper = new QueryWrapper<>();
+        videoWrapper.eq("video_id", videoId);
+
+        // 删除视频
+        viewsService.deleteViewsByVideoId(videoId);
+        videosMapper.delete(videoWrapper);
+        return true;
+    }
+
+    @Override
     public String getCover(String videoid) {
         QueryWrapper<Videos> videowrapper = new QueryWrapper<>();
         videowrapper.eq("video_id", videoid);
