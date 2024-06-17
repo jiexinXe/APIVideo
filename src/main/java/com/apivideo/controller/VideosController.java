@@ -117,8 +117,8 @@ public class VideosController {
             //保存文件
             Users users = usersService.getById(userId);
             String SavePath = "E:\\APIVideo\\src\\main\\resources\\videos\\" + users.getUsername() + "\\" + description;
-            String videoUrl = users.getUsername() + "\\" + videoFile.getOriginalFilename();
-            String coverUrl = users.getUsername() + "\\" + coverFile.getOriginalFilename();
+            String videoUrl = users.getUsername() + "\\" + description + "\\" + videoFile.getOriginalFilename();
+            String coverUrl = users.getUsername() + "\\" + description + "\\" + coverFile.getOriginalFilename();
             File filepath = new File(SavePath);
             if (!filepath.exists()) {
                 filepath.mkdirs();
