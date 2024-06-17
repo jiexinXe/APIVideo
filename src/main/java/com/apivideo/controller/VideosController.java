@@ -130,6 +130,7 @@ public class VideosController {
             File detailSave = new File(SavePath, detailFile.getOriginalFilename());
             detailFile.transferTo(detailSave);
 
+
             //插入数据库
             Videos saveVideo = new Videos();
             saveVideo.setDescription(description);
