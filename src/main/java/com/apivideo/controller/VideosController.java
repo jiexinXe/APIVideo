@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,30 +91,61 @@ public class VideosController {
     @ApiOperation(value = "保存上传的视频", notes = "将上传的视频文件保存到服务器")
     @PostMapping(value = "/saveVideo")
     @ResponseBody
-    public Map<String, String> saveVideo(@ApiParam(value = "视频文件", required = true) @RequestParam("file") MultipartFile file,
-                                         @ApiParam(value = "保存路径", required = true) @RequestParam String SavePath) throws IllegalStateException {
+    public Map<String, String> saveVideo(@ApiParam(value = "视频文件", required = true) @RequestParam("videoFile") MultipartFile videoFile,
+                                         @ApiParam(value = "封面文件", required = true) @RequestParam("coverFile") MultipartFile coverFile,
+                                         @ApiParam(value = "详情文件", required = true) @RequestParam("detailFile") MultipartFile detailFile,
+                                         @ApiParam(value = "描述", required = true) @RequestParam("description") String description,
+                                         @ApiParam(value = "用户id", required = true) @RequestParam("userId") String userId) throws IllegalStateException {
         Map<String, String> resultMap = new HashMap<>();
         try {
-            String fileExt = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
-            if (!fileExt.equals("mp4")) {
-                resultMap.put("不支持的视频类型", "400");
+            String videofileExt = videoFile.getOriginalFilename().substring(videoFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
+            String coverFileExt = coverFile.getOriginalFilename().substring(coverFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
+            String detailFileExt = detailFile.getOriginalFilename().substring(detailFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
+            if (!videofileExt.equals("mp4")) {
+                resultMap.put("不支持的视频类型，需要.MP4", "400");
                 return resultMap;
             }
-            String videoNameText = file.getOriginalFilename();
-            String videoUrl = SavePath + "/" + videoNameText;
+            if (!coverFileExt.equals("jpg")) {
+                resultMap.put("不支持的图片类型,需要.jpg", "400");
+                return resultMap;
+            }
+            if (!detailFileExt.equals("txt")) {
+                resultMap.put("不支持的描述类型,需要.txt", "400");
+                return resultMap;
+            }
+
+            //保存文件
+            Users users = usersService.getById(userId);
+            String SavePath = "E:\\APIVideo\\src\\main\\resources\\videos\\" + users.getUsername() + "\\" + description;
+            String videoUrl = users.getUsername() + "\\" + videoFile.getOriginalFilename();
+            String coverUrl = users.getUsername() + "\\" + coverFile.getOriginalFilename();
+            File filepath = new File(SavePath);
+            if (!filepath.exists()) {
+                filepath.mkdirs();
+            }
+            File videoSave = new File(SavePath, videoFile.getOriginalFilename());
+            videoFile.transferTo(videoSave);
+            File coverSave = new File(SavePath, coverFile.getOriginalFilename());
+            coverFile.transferTo(coverSave);
+            File detailSave = new File(SavePath, detailFile.getOriginalFilename());
+            detailFile.transferTo(detailSave);
+
+            //插入数据库
             Videos saveVideo = new Videos();
-            saveVideo.setDescription(videoNameText);
+            saveVideo.setDescription(description);
+            saveVideo.setTitle(description);
             saveVideo.setVideoPath(videoUrl);
+            saveVideo.setCoverPath(coverUrl);
+            saveVideo.setComments(0);
+            saveVideo.setLikes(0);
+            saveVideo.setLikes(0);
+            saveVideo.setShares(0);
+            saveVideo.setCollections(0);
+            saveVideo.setUploadTime(LocalDateTime.now());
+            saveVideo.setUserId(users.getUserId());
             videosService.save(saveVideo);
 
-            File filepath = new File(SavePath, file.getOriginalFilename());
-            if (!filepath.getParentFile().exists()) {
-                filepath.getParentFile().mkdirs();
-            }
-            File fileSave = new File(SavePath, videoNameText);
-            file.transferTo(fileSave);
-
-            resultMap.put("newVideoName", videoNameText);
+            resultMap.put("newVideoName", videoFile.getOriginalFilename());
             resultMap.put("resCode", "200");
             resultMap.put("VideoUrl", videoUrl);
             return resultMap;
