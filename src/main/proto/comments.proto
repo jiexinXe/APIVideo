@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.apivideo.grpc.comments";
+option java_outer_classname = "CommentsProto";
+
+import "common.proto";
+
+service CommentsService {
+  rpc GetComment (CommentRequest) returns (CommentReply);
+}
+
+message CommentRequest {
+  int32 id = 1;
+}
+
+message CommentReply {
+  int32 id = 1;
+  string content = 2;
+  int32 userId = 3;
+}

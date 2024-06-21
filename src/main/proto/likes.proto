@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.apivideo.grpc.likes";
+option java_outer_classname = "LikesProto";
+
+import "common.proto";
+
+service LikesService {
+  rpc GetLike (LikeRequest) returns (LikeReply);
+}
+
+message LikeRequest {
+  int32 id = 1;
+}
+
+message LikeReply {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 videoId = 3;
+}

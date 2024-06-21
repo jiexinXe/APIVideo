@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.apivideo.grpc.views";
+option java_outer_classname = "ViewsProto";
+
+import "common.proto";
+
+service ViewsService {
+  rpc GetView (ViewRequest) returns (ViewReply);
+  rpc AddViewedVideo (ViewedVideoRequest) returns (ViewReply);
+  rpc GetViewedVideos (UserRequest) returns (ViewedVideosReply);
+}
+
+message ViewRequest {
+  int32 id = 1;
+}
+
+message ViewReply {
+  int32 id = 1;
+  int32 userId = 2;
+  int32 videoId = 3;
+  int64 timestamp = 4;
+}
+
+message ViewedVideoRequest {
+  int32 userId = 1;
+  int32 videoId = 2;
+}
+
+message ViewedVideosReply {
+  repeated ViewReply views = 1;
+}

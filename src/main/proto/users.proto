@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.apivideo.grpc.users";
+option java_outer_classname = "UsersProto";
+
+import "common.proto";
+
+service UsersService {
+  rpc GetUser (UserRequest) returns (UserReply);
+  rpc FindByUsername (UsernameRequest) returns (UserReply);
+}
+
+message UserReply {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  string username = 4;
+}
+
+message UsernameRequest {
+  string username = 1;
+}

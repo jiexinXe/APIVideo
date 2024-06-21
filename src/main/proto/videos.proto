@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.apivideo.grpc.videos";
+option java_outer_classname = "VideosProto";
+
+import "common.proto";
+
+service VideosService {
+  rpc GetVideo (VideoRequest) returns (VideoReply);
+  rpc GetRecommendedVideos (RecommendedVideosRequest) returns (VideosReply);
+  rpc GetRandomVideos (RandomVideosRequest) returns (VideosReply);
+}
+
+message VideoRequest {
+  int32 id = 1;
+}
+
+message VideoReply {
+  int32 id = 1;
+  string title = 2;
+  string url = 3;
+}
+
+message RecommendedVideosRequest {
+  int32 userId = 1;
+  int32 limit = 2;
+}
+
+message RandomVideosRequest {
+  int32 limit = 1;
+}
+
+message VideosReply {
+  repeated VideoReply videos = 1;
+}
