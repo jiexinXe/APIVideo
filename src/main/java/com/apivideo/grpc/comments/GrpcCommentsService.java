@@ -14,13 +14,24 @@ public class GrpcCommentsService extends CommentsServiceGrpc.CommentsServiceImpl
 
     @Override
     public void getComment(CommentRequest request, StreamObserver<CommentReply> responseObserver) {
-        Comments comment = commentsService.getById(request.getId());
-        CommentReply reply = CommentReply.newBuilder()
-                .setId(comment.getCommentId())
-                .setContent(comment.getContent())
-                .setUserId(comment.getUserId())
-                .build();
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
+        try {
+            System.out.println("Received getComment request: " + request.getId());
+            Comments comment = commentsService.getById(request.getId());
+            if (comment != null) {
+                CommentReply reply = CommentReply.newBuilder()
+                        .setId(comment.getCommentId())
+                        .setContent(comment.getContent())
+                        .setUserId(comment.getUserId())
+                        .build();
+                responseObserver.onNext(reply);
+            } else {
+                responseObserver.onError(new Exception("Comment not found"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onError(e);
+        } finally {
+            responseObserver.onCompleted();
+        }
     }
 }

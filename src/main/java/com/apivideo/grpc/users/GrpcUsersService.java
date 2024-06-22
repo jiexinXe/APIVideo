@@ -16,26 +16,34 @@ public class GrpcUsersService extends UsersServiceGrpc.UsersServiceImplBase {
     @Override
     public void getUser(UserRequest request, StreamObserver<UserReply> responseObserver) {
         Users user = usersService.getById(request.getUserId());
-        UserReply reply = UserReply.newBuilder()
-                .setId(user.getUserId())
-                .setName(user.getUsername())
-                .setEmail(user.getEmail())
-                .setUsername(user.getUsername())
-                .build();
-        responseObserver.onNext(reply);
+        if (user != null) {
+            UserReply reply = UserReply.newBuilder()
+                    .setId(user.getUserId())
+                    .setName(user.getUsername())
+                    .setEmail(user.getEmail())
+                    .setUsername(user.getUsername())
+                    .build();
+            responseObserver.onNext(reply);
+        } else {
+            responseObserver.onError(new Exception("User not found"));
+        }
         responseObserver.onCompleted();
     }
 
     @Override
     public void findByUsername(UsernameRequest request, StreamObserver<UserReply> responseObserver) {
         Users user = usersService.findByUsername(request.getUsername());
-        UserReply reply = UserReply.newBuilder()
-                .setId(user.getUserId())
-                .setName(user.getUsername())
-                .setEmail(user.getEmail())
-                .setUsername(user.getUsername())
-                .build();
-        responseObserver.onNext(reply);
+        if (user != null) {
+            UserReply reply = UserReply.newBuilder()
+                    .setId(user.getUserId())
+                    .setName(user.getUsername())
+                    .setEmail(user.getEmail())
+                    .setUsername(user.getUsername())
+                    .build();
+            responseObserver.onNext(reply);
+        } else {
+            responseObserver.onError(new Exception("User not found"));
+        }
         responseObserver.onCompleted();
     }
 }
