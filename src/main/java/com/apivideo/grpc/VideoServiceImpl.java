@@ -217,7 +217,7 @@ public class VideoServiceImpl extends VideoServiceGrpc.VideoServiceImplBase {
             byte[] imageBytes = Files.readAllBytes(file.toPath());
             String base64EncodedImage = Base64Utils.encodeToString(imageBytes);
             VideoStatusResponse response = VideoStatusResponse.newBuilder()
-                    .setMessage("Cover retrieved successfully")
+                    .setMessage(base64EncodedImage)
                     // .setCoverPath(base64EncodedImage) // This line should be removed as it doesn't exist in VideoStatusResponse
                     .build();
             responseObserver.onNext(response);
