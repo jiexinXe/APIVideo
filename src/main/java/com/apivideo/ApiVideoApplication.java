@@ -24,7 +24,7 @@ public class ApiVideoApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("http://localhost:8081")
+                        .allowedOriginPatterns("http://localhost:8081", "http://116.196.85.2")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true)
