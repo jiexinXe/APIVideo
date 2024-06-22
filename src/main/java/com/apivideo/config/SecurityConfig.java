@@ -51,7 +51,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs",
                         "/v3/api-docs",
                         "/webjars/**",
-                        "/videos/list"       // 允许匿名访问获取视频列表
+                        "/videos/list",       // 允许匿名访问获取视频列表
+                        "/kafkaProducer/sendMessage", // 允许匿名访问Kafka生产者的发送消息接口
+                        "/kafkaConsumer/**"   // 允许匿名访问Kafka消费者的相关接口
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
