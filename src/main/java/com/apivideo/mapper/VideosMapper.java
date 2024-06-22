@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 @Mapper
@@ -27,4 +28,10 @@ public interface VideosMapper extends BaseMapper<Videos> {
             "</script>"
     })
     List<Videos> selectRecommendedVideosWithExclusions(@Param("excludedVideoIds") List<Integer> excludedVideoIds, @Param("limit") int limit);
+
+    @Update("UPDATE videos SET likes = likes + 1 WHERE video_id = #{videoId}")
+    void incrementLikes(Integer videoId);
+
+    @Update("UPDATE videos SET likes = likes - 1 WHERE video_id = #{videoId}")
+    void decrementLikes(Integer videoId);
 }

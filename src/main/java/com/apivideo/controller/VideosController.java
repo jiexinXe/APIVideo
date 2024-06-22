@@ -51,6 +51,7 @@ public class VideosController {
     @Autowired
     private ViewsService viewsService;
 
+
     @ApiOperation(value = "获取所有视频信息", notes = "获取数据库中所有视频的详细信息")
     @GetMapping("/list")
     public List<Videos> getAllVideos() {
@@ -108,28 +109,30 @@ public class VideosController {
                 return resultMap;
             }
 
-            //保存文件
+            // 获取项目根路径
+            String rootPath = System.getProperty("user.dir");
+
+            // 保存文件路径
             Users users = usersService.getById(userId);
-            String SavePath = "src/main/resources/videos/" + users.getUsername() + "/" + description;
-            String videoUrl = users.getUsername() + "\\" + description + "\\" + videoFile.getOriginalFilename();
-            String coverUrl = users.getUsername() + "\\" + description + "\\" + coverFile.getOriginalFilename();
-            File filepath = new File(SavePath);
+            String savePath = rootPath + "/src/main/resources/videos/" + users.getUsername() + "/" + description;
+            String videoUrl = users.getUsername() + "/" + description + "/" + videoFile.getOriginalFilename();
+            String coverUrl = users.getUsername() + "/" + description + "/" + coverFile.getOriginalFilename();
+            File filepath = new File(savePath);
             if (!filepath.exists()) {
                 filepath.mkdirs();
             }
-            File videoSave = new File(SavePath, videoFile.getOriginalFilename());
+            File videoSave = new File(savePath, videoFile.getOriginalFilename());
             videoFile.transferTo(videoSave);
-            File coverSave = new File(SavePath, coverFile.getOriginalFilename());
+            File coverSave = new File(savePath, coverFile.getOriginalFilename());
             coverFile.transferTo(coverSave);
 
-            //插入数据库
+            // 插入数据库
             Videos saveVideo = new Videos();
             saveVideo.setDescription(description);
             saveVideo.setTitle(description);
             saveVideo.setVideoPath(videoUrl);
             saveVideo.setCoverPath(coverUrl);
             saveVideo.setComments(0);
-            saveVideo.setLikes(0);
             saveVideo.setLikes(0);
             saveVideo.setShares(0);
             saveVideo.setCollections(0);
@@ -147,6 +150,7 @@ public class VideosController {
             return resultMap;
         }
     }
+
 
     @ApiOperation(value = "查询当前推荐视频", notes = "获取当前推荐的视频列表")
     @GetMapping("/recommend")
