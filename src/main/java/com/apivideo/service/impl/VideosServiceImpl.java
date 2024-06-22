@@ -7,6 +7,7 @@ import com.apivideo.mapper.VideosMapper;
 import com.apivideo.service.VideosService;
 import com.apivideo.service.ViewsService;
 import com.apivideo.utils.Code;
+import com.apivideo.utils.RedisUtils;
 import com.apivideo.utils.Rest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,6 +35,8 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
     private VideosMapper videosMapper;
     @Autowired
     private LikesMapper likesMapper;
+    @Autowired
+    private RedisUtils redisUtil;
 
     @Override
     public List<Videos> getRecommendedVideos(Integer userId, int limit) {
@@ -67,35 +70,28 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
 
 
     @Override
-    @Transactional
     public void likeVideo(Integer userId, Integer videoId) {
-        // 更新视频的点赞数
-        Videos video = this.getById(videoId);
-        if (video != null) {
-            video.setLikes(video.getLikes() + 1);
-            this.updateById(video);
-
-            // 在 likes 表中插入记录
-            Likes like = new Likes();
-            like.setUserId(userId);
-            like.setVideoId(videoId);
-            likesMapper.insert(like);
+        String key = "like:" + userId + ":" + videoId;
+        if (!redisUtil.hasKey(key)) {
+            redisUtil.set(key, true);
+            // 更新数据库中的点赞数
+            baseMapper.incrementLikes(videoId);
         }
     }
 
     @Override
-    @Transactional
-    public void unlikeVideo(Integer userId, Integer videoId) {
-        // 更新视频的点赞数
-        Videos video = this.getById(videoId);
-        if (video != null) {
-            video.setLikes(video.getLikes() - 1);
-            this.updateById(video);
+    public boolean hasLiked(Integer userId, Integer videoId) {
+        String key = "like:" + userId + ":" + videoId;
+        return redisUtil.hasKey(key);
+    }
 
-            // 从 likes 表中删除记录
-            QueryWrapper<Likes> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", userId).eq("video_id", videoId);
-            likesMapper.delete(queryWrapper);
+    @Override
+    public void unlikeVideo(Integer userId, Integer videoId) {
+        String key = "like:" + userId + ":" + videoId;
+        if (redisUtil.hasKey(key)) {
+            redisUtil.delete(key);
+            // 更新数据库中的点赞数
+            baseMapper.decrementLikes(videoId);
         }
     }
 
@@ -104,11 +100,7 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
         return this.lambdaQuery().last("ORDER BY RAND() LIMIT " + limit).list();
     }
 
-    @Override
-    public boolean hasLiked(Integer userId, Integer videoId) {
-        int count = likesMapper.countByUserIdAndVideoId(userId, videoId);
-        return count > 0;
-    }
+
 
     @Override
     public List<Videos> getVideosOfUser(Integer userId, String page) {

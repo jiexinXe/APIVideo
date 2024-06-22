@@ -51,6 +51,7 @@ public class VideosController {
     @Autowired
     private ViewsService viewsService;
 
+
     @ApiOperation(value = "获取所有视频信息", notes = "获取数据库中所有视频的详细信息")
     @GetMapping("/list")
     public List<Videos> getAllVideos() {
