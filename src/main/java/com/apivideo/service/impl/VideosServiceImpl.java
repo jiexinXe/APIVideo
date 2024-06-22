@@ -46,17 +46,25 @@ public class VideosServiceImpl extends ServiceImpl<VideosMapper, Videos> impleme
             // 登录状态下推荐用户未观看的按点赞数排序的视频
             List<Integer> viewedVideoIds = viewsService.getViewedVideoIds(userId);
             System.out.println("User ID: " + userId + ", Viewed video IDs: " + viewedVideoIds);
-            if (viewedVideoIds.isEmpty()) {
-                List<Videos> videos = videosMapper.selectRecommendedVideosWithoutExclusions(limit);
-                System.out.println("Recommended videos for user " + userId + ": " + videos);
-                return videos;
+
+            // 如果未观看的视频数量少于限制数量
+            List<Videos> videos = videosMapper.selectRecommendedVideosWithExclusions(viewedVideoIds, limit);
+            if (videos.size() < limit) {
+                // 清除用户的观看记录
+                viewsService.clearViewedVideos(userId);
+                System.out.println("Cleared viewed videos for user " + userId);
+
+                // 重新获取推荐视频
+                videos = videosMapper.selectRecommendedVideosWithoutExclusions(limit);
+                System.out.println("Re-recommended videos for user " + userId + ": " + videos);
             } else {
-                List<Videos> videos = videosMapper.selectRecommendedVideosWithExclusions(viewedVideoIds, limit);
                 System.out.println("Recommended videos for user " + userId + " with exclusions: " + videos);
-                return videos;
             }
+
+            return videos;
         }
     }
+
 
     @Override
     @Transactional

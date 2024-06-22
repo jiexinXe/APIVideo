@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,9 @@ public class UsersController {
     @ApiOperation(value = "用户注册", notes = "用户通过提供用户名和密码注册新账户")
     @PostMapping("/register")
     public Map<String, String> register(@ApiParam(value = "用户信息", required = true) @RequestBody Users user) {
+        // 对用户名进行HTML转义以防止XSS
+        String sanitizedUsername = HtmlUtils.htmlEscape(user.getUsername());
+        user.setUsername(sanitizedUsername);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         boolean result = usersService.save(user);
         Map<String, String> response = new HashMap<>();
@@ -48,8 +52,10 @@ public class UsersController {
     @ApiOperation(value = "用户登录", notes = "用户通过提供用户名和密码登录")
     @PostMapping("/login")
     public Map<String, String> login(@ApiParam(value = "用户信息", required = true) @RequestBody Users user) {
+        // 对用户名进行HTML转义以防止XSS
+        String sanitizedUsername = HtmlUtils.htmlEscape(user.getUsername());
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+                new UsernamePasswordAuthenticationToken(sanitizedUsername, user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateToken(authentication);
         Map<String, String> response = new HashMap<>();
@@ -67,7 +73,7 @@ public class UsersController {
             if (user != null) {
                 Map<String, Object> userInfo = new HashMap<>();
                 userInfo.put("userId", user.getUserId());
-                userInfo.put("username", user.getUsername());
+                userInfo.put("username", HtmlUtils.htmlEscape(user.getUsername())); // 对用户名进行HTML转义以防止XSS
                 // 如果你有更多需要返回的用户信息，可以在这里添加
                 return userInfo;
             }

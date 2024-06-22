@@ -17,4 +17,7 @@ public interface ViewsMapper {
 
     @Delete("DELETE FROM views WHERE video_id = #{videoId}")
     void deleteViewsByVideoId(@Param("videoId") Integer videoId);
+
+    @Delete("DELETE FROM views WHERE user_id = #{userId}")
+    void deleteViewsByUserId(@Param("userId") Integer userId);
 }
