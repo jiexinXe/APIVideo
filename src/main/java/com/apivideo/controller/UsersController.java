@@ -1,5 +1,6 @@
 package com.apivideo.controller;
 
+import com.apivideo.client.UserClient;
 import com.apivideo.entity.Users;
 import com.apivideo.service.UsersService;
 import com.apivideo.utils.JwtUtils;
@@ -25,6 +26,8 @@ import java.util.Map;
 public class UsersController {
 
     @Autowired
+    private UserClient userClient;
+    @Autowired
     private UsersService usersService;
 
     @Autowired
@@ -43,7 +46,7 @@ public class UsersController {
         String sanitizedUsername = HtmlUtils.htmlEscape(user.getUsername());
         user.setUsername(sanitizedUsername);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        boolean result = usersService.save(user);
+        boolean result = userClient.registerUser(user);
         Map<String, String> response = new HashMap<>();
         response.put("message", result ? "User registered successfully" : "User registration failed");
         return response;
@@ -69,7 +72,7 @@ public class UsersController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             String username = ((UserDetails) principal).getUsername();
-            Users user = usersService.findByUsername(username);
+            Users user = userClient.getUserInfo(username);
             if (user != null) {
                 Map<String, Object> userInfo = new HashMap<>();
                 userInfo.put("userId", user.getUserId());

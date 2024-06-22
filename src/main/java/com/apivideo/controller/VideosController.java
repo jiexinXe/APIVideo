@@ -1,5 +1,8 @@
 package com.apivideo.controller;
 
+import com.apivideo.client.UserClient;
+import com.apivideo.client.VideoClient;
+import com.apivideo.client.ViewClient;
 import com.apivideo.entity.Users;
 import com.apivideo.entity.Videos;
 import com.apivideo.service.UsersService;
@@ -32,6 +35,12 @@ import java.util.Map;
 public class VideosController {
 
     @Autowired
+    private VideoClient videoClient;
+    @Autowired
+    private UserClient userClient;
+    @Autowired
+    private ViewClient viewClient;
+    @Autowired
     private VideosService videosService;
     @Autowired
     private UsersService usersService;
@@ -48,15 +57,15 @@ public class VideosController {
     @ApiOperation(value = "按视频ID查找单个视频", notes = "根据视频ID获取视频流")
     @GetMapping("/get/{id}")
     public String getVideoById(@ApiParam(value = "视频ID", required = true) @PathVariable Integer id) throws ServletException, IOException {
-        Videos video = videosService.getById(id);
+        Videos video = videoClient.getVideoById(id);
         if (video != null) {
             // 记录用户观看历史
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (principal instanceof UserDetails) {
                 String username = ((UserDetails) principal).getUsername();
-                Users user = usersService.findByUsername(username);
+                Users user = userClient.getUserInfo(username);
                 if (user != null) {
-                    viewsService.addViewedVideo(user.getUserId(), id);
+                    viewClient.addView(user.getUserId(), id);
                 }
             }
             String videoPathUrl = video.getVideoPath();
@@ -125,7 +134,7 @@ public class VideosController {
             saveVideo.setCollections(0);
             saveVideo.setUploadTime(LocalDateTime.now());
             saveVideo.setUserId(users.getUserId());
-            videosService.save(saveVideo);
+            videoClient.addVideo(saveVideo);
 
             resultMap.put("newVideoName", videoFile.getOriginalFilename());
             resultMap.put("resCode", "200");
@@ -157,7 +166,7 @@ public class VideosController {
             }
         }
         System.out.println(userId); // 调试用
-        return videosService.getRecommendedVideos(userId, 4);
+        return videoClient.getRecommendedVideos(userId);
     }
 
     @ApiOperation(value = "点赞视频", notes = "用户可以通过提供视频ID和用户ID点赞视频")
@@ -168,7 +177,7 @@ public class VideosController {
             videosService.unlikeVideo(userId, videoId);
             return "Video unliked successfully!";
         } else {
-            videosService.likeVideo(userId, videoId);
+            videoClient.likeVideo(userId, videoId);
             return "Video liked successfully!";
         }
     }
@@ -183,7 +192,7 @@ public class VideosController {
     @ApiOperation(value = "查看用户的所有视频", notes = "根据用户ID获取用户的所有视频")
     @GetMapping("/{userid}")
     public Rest getVideosOfUser(@PathVariable Integer userid, @RequestParam("page") String page) {
-        List<Videos> videos = videosService.getVideosOfUser(userid, page);
+        List<Videos> videos = videoClient.getVideosOfUser(userid);
         return new Rest(Code.rc200.getCode(), videos, "该用户视频列表");
     }
 
@@ -191,7 +200,7 @@ public class VideosController {
     @DeleteMapping("/deleteVideo/{userid}")
     public Rest deleteVideo(@ApiParam(value = "用户ID", required = true) @PathVariable Integer userid,
                             @ApiParam(value = "需要删除的视频ID", required = true) @RequestParam("video_id") Integer videoId) {
-        if (videosService.deleteVideo(userid, videoId))
+        if (videoClient.deleteVideo(userid, videoId))
             return new Rest(Code.rc200.getCode(), "视频删除成功");
         return new Rest(Code.rc403.getCode(), "不可删除其他用户的视频");
     }
@@ -211,7 +220,7 @@ public class VideosController {
 
         String local_path = "src/main/resources/videos/";
 
-        String cover_path = videosService.getCover(videoid);
+        String cover_path = videoClient.getCover(Integer.parseInt(videoid));
 
         // 读取图片文件
         File file = new File(local_path + cover_path);
