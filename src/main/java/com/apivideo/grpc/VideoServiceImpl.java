@@ -217,13 +217,37 @@ public class VideoServiceImpl extends VideoServiceGrpc.VideoServiceImplBase {
             byte[] imageBytes = Files.readAllBytes(file.toPath());
             String base64EncodedImage = Base64Utils.encodeToString(imageBytes);
             VideoStatusResponse response = VideoStatusResponse.newBuilder()
-                    .setMessage("Cover retrieved successfully")
+                    .setMessage(base64EncodedImage)
                     // .setCoverPath(base64EncodedImage) // This line should be removed as it doesn't exist in VideoStatusResponse
                     .build();
             responseObserver.onNext(response);
         } catch (IOException e) {
             responseObserver.onError(e);
         }
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void listVideos(VideoRequest request, StreamObserver<VideoListResponse> responseObserver) {
+        List<Videos> videos = videosService.list();
+        VideoListResponse.Builder responseBuilder = VideoListResponse.newBuilder();
+        for (Videos video : videos) {
+            VideoResponse videoResponse = VideoResponse.newBuilder()
+                    .setVideoId(video.getVideoId())
+                    .setUserId(video.getUserId())
+                    .setTitle(video.getTitle())
+                    .setDescription(video.getDescription())
+                    .setCoverPath(video.getCoverPath())
+                    .setVideoPath(video.getVideoPath())
+                    .setLikes(video.getLikes())
+                    .setComments(video.getComments())
+                    .setCollections(video.getCollections())
+                    .setShares(video.getShares())
+                    .setUploadTime(video.getUploadTime().format(formatter))
+                    .build();
+            responseBuilder.addVideos(videoResponse);
+        }
+        responseObserver.onNext(responseBuilder.build());
         responseObserver.onCompleted();
     }
 }

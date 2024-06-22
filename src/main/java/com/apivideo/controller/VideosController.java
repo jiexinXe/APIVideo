@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Base64Utils;
@@ -50,6 +51,8 @@ public class VideosController {
     private UsersService usersService;
     @Autowired
     private ViewsService viewsService;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
 
     @ApiOperation(value = "获取所有视频信息", notes = "获取数据库中所有视频的详细信息")
@@ -177,13 +180,20 @@ public class VideosController {
     @PostMapping("/{videoId}/like")
     public String likeVideo(@ApiParam(value = "视频ID", required = true) @PathVariable Integer videoId,
                             @ApiParam(value = "用户ID", required = true) @RequestParam Integer userId) {
+        String message;
         if (videosService.hasLiked(userId, videoId)) {
             videosService.unlikeVideo(userId, videoId);
-            return "Video unliked successfully!";
+            message = "Video unliked successfully!";
         } else {
             videosService.likeVideo(userId, videoId);
-            return "Video liked successfully!";
+            message = "Video liked successfully!";
         }
+
+        // 发送 Kafka 消息
+        String kafkaMessage = "User ID: " + userId + ", Video ID: " + videoId + ", Action: " + (videosService.hasLiked(userId, videoId) ? "like" : "unlike");
+        kafkaTemplate.send("apivideo", kafkaMessage);
+
+        return message;
     }
 
     @ApiOperation(value = "检查用户是否已点赞视频", notes = "检查用户是否已经点赞某个视频")
