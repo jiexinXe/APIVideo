@@ -1,5 +1,6 @@
 package com.apivideo.service.impl;
 
+import com.apivideo.entity.Views;
 import com.apivideo.mapper.ViewsMapper;
 import com.apivideo.service.ViewsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,11 @@ public class ViewsServiceImpl implements ViewsService {
     @Override
     public void deleteViewsByVideoId(Integer videoId){
         viewsMapper.deleteViewsByVideoId(videoId);
+    }
+
+    @Override
+    public void clearViewedVideos(Integer userId) {
+        viewsMapper.deleteViewsByUserId(userId);
     }
 }
 
