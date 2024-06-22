@@ -226,4 +226,28 @@ public class VideoServiceImpl extends VideoServiceGrpc.VideoServiceImplBase {
         }
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void listVideos(VideoRequest request, StreamObserver<VideoListResponse> responseObserver) {
+        List<Videos> videos = videosService.list();
+        VideoListResponse.Builder responseBuilder = VideoListResponse.newBuilder();
+        for (Videos video : videos) {
+            VideoResponse videoResponse = VideoResponse.newBuilder()
+                    .setVideoId(video.getVideoId())
+                    .setUserId(video.getUserId())
+                    .setTitle(video.getTitle())
+                    .setDescription(video.getDescription())
+                    .setCoverPath(video.getCoverPath())
+                    .setVideoPath(video.getVideoPath())
+                    .setLikes(video.getLikes())
+                    .setComments(video.getComments())
+                    .setCollections(video.getCollections())
+                    .setShares(video.getShares())
+                    .setUploadTime(video.getUploadTime().format(formatter))
+                    .build();
+            responseBuilder.addVideos(videoResponse);
+        }
+        responseObserver.onNext(responseBuilder.build());
+        responseObserver.onCompleted();
+    }
 }

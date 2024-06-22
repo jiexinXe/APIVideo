@@ -77,4 +77,7 @@ service VideoService {
 
   // Gets the cover of a video
   rpc GetCover (VideoRequest) returns (VideoStatusResponse);
+
+  // List all videos
+  rpc ListVideos (VideoRequest) returns (VideoListResponse);
 }
