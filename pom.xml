@@ -40,6 +40,11 @@
             <version>3.19.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <!-- Spring AOP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -199,6 +204,7 @@
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.42.1:exe:${os.detected.classifier}</pluginArtifact>
                     <protoSourceRoot>src/main/proto</protoSourceRoot>
+<!--                    <outputDirectory>${project.build.directory}/generated-sources/protobuf/java</outputDirectory>-->
                 </configuration>
                 <executions>
                     <execution>

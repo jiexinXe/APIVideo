@@ -93,24 +93,18 @@ public class VideosController {
     @ResponseBody
     public Map<String, String> saveVideo(@ApiParam(value = "视频文件", required = true) @RequestParam("videoFile") MultipartFile videoFile,
                                          @ApiParam(value = "封面文件", required = true) @RequestParam("coverFile") MultipartFile coverFile,
-                                         @ApiParam(value = "详情文件", required = true) @RequestParam("detailFile") MultipartFile detailFile,
                                          @ApiParam(value = "描述", required = true) @RequestParam("description") String description,
                                          @ApiParam(value = "用户id", required = true) @RequestParam("userId") String userId) throws IllegalStateException {
         Map<String, String> resultMap = new HashMap<>();
         try {
             String videofileExt = videoFile.getOriginalFilename().substring(videoFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
             String coverFileExt = coverFile.getOriginalFilename().substring(coverFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
-            String detailFileExt = detailFile.getOriginalFilename().substring(detailFile.getOriginalFilename().lastIndexOf(".") + 1).toLowerCase();
             if (!videofileExt.equals("mp4")) {
                 resultMap.put("不支持的视频类型，需要.MP4", "400");
                 return resultMap;
             }
             if (!coverFileExt.equals("jpg")) {
                 resultMap.put("不支持的图片类型,需要.jpg", "400");
-                return resultMap;
-            }
-            if (!detailFileExt.equals("txt")) {
-                resultMap.put("不支持的描述类型,需要.txt", "400");
                 return resultMap;
             }
 
@@ -127,9 +121,6 @@ public class VideosController {
             videoFile.transferTo(videoSave);
             File coverSave = new File(SavePath, coverFile.getOriginalFilename());
             coverFile.transferTo(coverSave);
-            File detailSave = new File(SavePath, detailFile.getOriginalFilename());
-            detailFile.transferTo(detailSave);
-
 
             //插入数据库
             Videos saveVideo = new Videos();
