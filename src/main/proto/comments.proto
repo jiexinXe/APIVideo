@@ -1,21 +1,36 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "com.apivideo.grpc.comments";
+option java_package = "com.apivideo.grpc";
 option java_outer_classname = "CommentsProto";
+option objc_class_prefix = "AVP";
 
-import "common.proto";
+package comments;
 
-service CommentsService {
-  rpc GetComment (CommentRequest) returns (CommentReply);
-}
-
+// The request message containing the comment details.
 message CommentRequest {
-  int32 id = 1;
+  int32 comment_id = 1;
+  int32 video_id = 2;
+  int32 user_id = 3;
+  string content = 4;
 }
 
-message CommentReply {
-  int32 id = 1;
-  string content = 2;
-  int32 userId = 3;
+// The response message containing the status of the request.
+message CommentResponse {
+  int32 status = 1;
+  string message = 2;
+}
+
+// The comment service definition.
+service CommentService {
+  // Adds a new comment
+  rpc AddComment (CommentRequest) returns (CommentResponse);
+
+  // Retrieves a comment by ID
+  rpc GetComment (CommentRequest) returns (CommentRequest);
+
+  // Deletes a comment by ID
+  rpc DeleteComment (CommentRequest) returns (CommentResponse);
+
+  // Updates an existing comment
+  rpc UpdateComment (CommentRequest) returns (CommentResponse);
 }

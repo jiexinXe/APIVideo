@@ -1,23 +1,41 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "com.apivideo.grpc.users";
+option java_package = "com.apivideo.grpc";
 option java_outer_classname = "UsersProto";
+option objc_class_prefix = "AVP";
 
-import "common.proto";
+package users;
 
-service UsersService {
-  rpc GetUser (UserRequest) returns (UserReply);
-  rpc FindByUsername (UsernameRequest) returns (UserReply);
+// The request message for user details.
+message UserRequest {
+  int32 user_id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
 }
 
-message UserReply {
-  int32 id = 1;
-  string name = 2;
+// The response message containing the user details.
+message UserResponse {
+  int32 user_id = 1;
+  string username = 2;
   string email = 3;
-  string username = 4;
+  string message = 4;
 }
 
-message UsernameRequest {
-  string username = 1;
+// The response message containing the token for login.
+message UserLoginResponse {
+  string token = 1;
+  string message = 2;
+}
+
+// The user service definition.
+service UserService {
+  // Registers a new user
+  rpc RegisterUser (UserRequest) returns (UserResponse);
+
+  // Logs in a user
+  rpc LoginUser (UserRequest) returns (UserLoginResponse);
+
+  // Retrieves user info
+  rpc GetUserInfo (UserRequest) returns (UserResponse);
 }

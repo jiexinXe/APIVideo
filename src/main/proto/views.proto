@@ -1,32 +1,47 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "com.apivideo.grpc.views";
+option java_package = "com.apivideo.grpc";
 option java_outer_classname = "ViewsProto";
+option objc_class_prefix = "AVP";
 
-import "common.proto";
+package views;
 
-service ViewsService {
-  rpc GetView (ViewRequest) returns (ViewReply);
-  rpc AddViewedVideo (ViewedVideoRequest) returns (ViewReply);
-  rpc GetViewedVideos (UserRequest) returns (ViewedVideosReply);
-}
-
+// The request message for view details.
 message ViewRequest {
-  int32 id = 1;
+  int32 view_id = 1;
+  int32 video_id = 2;
+  int32 user_id = 3;
 }
 
-message ViewReply {
-  int32 id = 1;
-  int32 userId = 2;
-  int32 videoId = 3;
+// The response message containing the view details.
+message ViewResponse {
+  int32 view_id = 1;
+  int32 video_id = 2;
+  int32 user_id = 3;
+  string message = 4;
 }
 
-message ViewedVideoRequest {
-  int32 userId = 1;
-  int32 videoId = 2;
+// The response message containing a list of viewed video IDs.
+message ViewListResponse {
+  repeated int32 video_ids = 1;
 }
 
-message ViewedVideosReply {
-  repeated ViewReply views = 1;
+// The response message containing the status of the request.
+message ViewStatusResponse {
+  string message = 1;
+}
+
+// The view service definition.
+service ViewService {
+  // Adds a new view
+  rpc AddView (ViewRequest) returns (ViewStatusResponse);
+
+  // Retrieves viewed video IDs by user ID
+  rpc GetViewedVideoIds (ViewRequest) returns (ViewListResponse);
+
+  // Deletes views by video ID
+  rpc DeleteViewsByVideoId (ViewRequest) returns (ViewStatusResponse);
+
+  // Clears views by user ID
+  rpc ClearViewedVideos (ViewRequest) returns (ViewStatusResponse);
 }

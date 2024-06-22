@@ -235,7 +235,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.apivideo.grpc.GrpcApplication</mainClass>
+                    <mainClass>com.apivideo.ApiVideoApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

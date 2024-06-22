@@ -1,36 +1,80 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "com.apivideo.grpc.videos";
+option java_package = "com.apivideo.grpc";
 option java_outer_classname = "VideosProto";
+option objc_class_prefix = "AVP";
 
-import "common.proto";
+package videos;
 
-service VideosService {
-  rpc GetVideo (VideoRequest) returns (VideoReply);
-  rpc GetRecommendedVideos (RecommendedVideosRequest) returns (VideosReply);
-  rpc GetRandomVideos (RandomVideosRequest) returns (VideosReply);
-}
-
+// The request message for video details.
 message VideoRequest {
-  int32 id = 1;
+  int32 video_id = 1;
+  int32 user_id = 2;
+  string title = 3;
+  string description = 4;
+  string cover_path = 5;
+  string video_path = 6;
+  int32 likes = 7;
+  int32 comments = 8;
+  int32 collections = 9;
+  int32 shares = 10;
+  string upload_time = 11;
 }
 
-message VideoReply {
-  int32 id = 1;
-  string title = 2;
-  string url = 3;
+// The response message containing the video details.
+message VideoResponse {
+  int32 video_id = 1;
+  int32 user_id = 2;
+  string title = 3;
+  string description = 4;
+  string cover_path = 5;
+  string video_path = 6;
+  int32 likes = 7;
+  int32 comments = 8;
+  int32 collections = 9;
+  int32 shares = 10;
+  string upload_time = 11;
 }
 
-message RecommendedVideosRequest {
-  int32 userId = 1;
-  int32 limit = 2;
+// The response message containing a list of videos.
+message VideoListResponse {
+  repeated VideoResponse videos = 1;
 }
 
-message RandomVideosRequest {
-  int32 limit = 1;
+// The response message containing the status of the request.
+message VideoStatusResponse {
+  string message = 1;
 }
 
-message VideosReply {
-  repeated VideoReply videos = 1;
+// The video service definition.
+service VideoService {
+  // Adds a new video
+  rpc AddVideo (VideoRequest) returns (VideoStatusResponse);
+
+  // Retrieves a video by ID
+  rpc GetVideoById (VideoRequest) returns (VideoResponse);
+
+  // Deletes a video by ID
+  rpc DeleteVideo (VideoRequest) returns (VideoStatusResponse);
+
+  // Updates an existing video
+  rpc UpdateVideo (VideoRequest) returns (VideoStatusResponse);
+
+  // Retrieves recommended videos
+  rpc GetRecommendedVideos (VideoRequest) returns (VideoListResponse);
+
+  // Likes a video
+  rpc LikeVideo (VideoRequest) returns (VideoStatusResponse);
+
+  // Unlikes a video
+  rpc UnlikeVideo (VideoRequest) returns (VideoStatusResponse);
+
+  // Checks if a user has liked a video
+  rpc HasLiked (VideoRequest) returns (VideoStatusResponse);
+
+  // Retrieves videos of a user
+  rpc GetVideosOfUser (VideoRequest) returns (VideoListResponse);
+
+  // Gets the cover of a video
+  rpc GetCover (VideoRequest) returns (VideoStatusResponse);
 }
