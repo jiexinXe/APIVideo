@@ -73,12 +73,14 @@ public class VideosController {
                 Users user = usersService.findByUsername(username);
                 if (user != null) {
                     viewsService.addViewedVideo(user.getUserId(), id);
+                    // 发送 Kafka 消息
+                    String kafkaMessage = "User ID: " + user.getUserId() + ", Video ID: " + id + ", Action: view";
+                    kafkaTemplate.send("apivideo", kafkaMessage);
                 }
             }
             String videoPathUrl = video.getVideoPath();
             // 读取图片文件
             File file = new File("src/main/resources/videos/" + videoPathUrl);
-
 
             if (file.exists()) {
                 byte[] imageBytes = Files.readAllBytes(file.toPath());
